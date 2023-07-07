@@ -69,9 +69,13 @@ namespace Streamish.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                          SELECT Title, Description, Url, DateCreated, UserProfileId
-                            FROM Video
-                           WHERE Id = @Id";
+                          SELECT v.Title, v.Description, v.Url, v.DateCreated, v.UserProfileId,
+                          
+                          up.Name, up.Email, up.DateCreated AS UserProfileDateCreated, up.ImageUrl AS UserProfileImageUrl
+
+                            FROM Video v
+                            JOIN UserProfile up ON v.UserProfileId = up.Id
+                           WHERE v.Id = @Id";
 
                     DbUtils.AddParameter(cmd, "@Id", id);
 
@@ -89,6 +93,14 @@ namespace Streamish.Repositories
                                 DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
                                 Url = DbUtils.GetString(reader, "Url"),
                                 UserProfileId = DbUtils.GetInt(reader, "UserProfileId"),
+                                UserProfile = new UserProfile()//attaching user profile object to the video object
+                                {
+                                    Id = DbUtils.GetInt(reader, "UserProfileId"),
+                                    Name = DbUtils.GetString(reader, "Name"),
+                                    Email = DbUtils.GetString(reader, "Email"),
+                                    DateCreated = DbUtils.GetDateTime(reader, "UserProfileDateCreated"),
+                                    ImageUrl = DbUtils.GetString(reader, "UserProfileImageUrl"),
+                                }
                             };
                         }
 
@@ -187,13 +199,13 @@ namespace Streamish.Repositories
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
 
-                        var videos = new List<Video>();
+                        var videos = new List<Video>();//list of videos
                         while (reader.Read())
                         {
-                            var videoId = DbUtils.GetInt(reader, "VideoId");
+                            var videoId = DbUtils.GetInt(reader, "VideoId");//grab the current row's video id
 
-                            var existingVideo = videos.FirstOrDefault(p => p.Id == videoId);
-                            if (existingVideo == null)
+                            var existingVideo = videos.FirstOrDefault(p => p.Id == videoId);//check the list of videos to see if we have a video in the list there already
+                            if (existingVideo == null)//if not, make a new video object to add to the list.
                             {
                                 existingVideo = new Video()
                                 {
@@ -203,7 +215,7 @@ namespace Streamish.Repositories
                                     DateCreated = DbUtils.GetDateTime(reader, "VideoDateCreated"),
                                     Url = DbUtils.GetString(reader, "Url"),
                                     UserProfileId = DbUtils.GetInt(reader, "VideoUserProfileId"),
-                                    UserProfile = new UserProfile()
+                                    UserProfile = new UserProfile()//attaching user profile object to the video object
                                     {
                                         Id = DbUtils.GetInt(reader, "VideoUserProfileId"),
                                         Name = DbUtils.GetString(reader, "Name"),
@@ -211,22 +223,23 @@ namespace Streamish.Repositories
                                         DateCreated = DbUtils.GetDateTime(reader, "UserProfileDateCreated"),
                                         ImageUrl = DbUtils.GetString(reader, "UserProfileImageUrl"),
                                     },
-                                    Comments = new List<Comment>()
+                                    Comments = new List<Comment>()//attaching the list of a videos comments. it is currently empty.
                                 };
 
-                                videos.Add(existingVideo);
-                            }
+                                videos.Add(existingVideo);//add video to list
+                            }//end of if statement that generates a new comment entry is one doesnt already exist.
 
-                            if (DbUtils.IsNotDbNull(reader, "CommentId"))
+                            if (DbUtils.IsNotDbNull(reader, "CommentId"))//after the if statement, always check the row for a comment id
                             {
-                                existingVideo.Comments.Add(new Comment()
+                                existingVideo.Comments.Add(new Comment()//if we find one, we add a new comment object to the list inside of the video object we may have just made,
+                                                                        //or already made previously
                                 {
                                     Id = DbUtils.GetInt(reader, "CommentId"),
                                     Message = DbUtils.GetString(reader, "Message"),
                                     VideoId = videoId,
                                     UserProfileId = DbUtils.GetInt(reader, "CommentUserProfileId")
                                 });
-                            }
+                            }//end of current loop cycle, continue if more rows, exit out and return if not
                         }
 
                         return videos;
