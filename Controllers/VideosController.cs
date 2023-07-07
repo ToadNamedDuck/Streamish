@@ -64,5 +64,16 @@ namespace Streamish.Controllers
             var videos = _videoRepository.GetAllWithComments();
             return Ok(videos);
         }
+
+        [HttpGet("GetVideoByIdWithComments{id}")]
+        public IActionResult GetVideoByIdWithComments(int id)
+        {
+            Video video = _videoRepository.GetVideoByIdWithComments(id);
+            if(video == null)
+            {
+                return NotFound();
+            }
+            return Ok(video);
+        }
     }
 }

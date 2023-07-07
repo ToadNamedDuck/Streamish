@@ -247,5 +247,59 @@ namespace Streamish.Repositories
                 }
             }
         }
+        public Video GetVideoByIdWithComments(int id)
+        {
+            Video video = null;
+            using(var connection = Connection)
+            {
+                connection.Open();
+                using(var command = connection.CreateCommand())
+                {
+                    command.CommandText = @"
+                                            Select v.Title, v.Description, v.Url, v.DateCreated as VideoCreationDate, v.UserProfileId as VideoPosterId,
+                                            
+                                            c.Id as CommentId, c.Message, c.UserProfileId as CommentPosterId
+
+                                            from Video v
+                                            LEFT JOIN Comment c
+                                            on c.VideoId = v.Id
+                                            where v.Id = @id";
+
+                    command.Parameters.AddWithValue("@id", id);
+
+                    using(var reader = command.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            if(video == null)
+                            {
+                                video = new()
+                                {
+                                    Id = id,
+                                    Title = DbUtils.GetString(reader, "Title"),
+                                    Description = DbUtils.GetString(reader, "Description"),
+                                    Url = DbUtils.GetString(reader, "Url"),
+                                    DateCreated = DbUtils.GetDateTime(reader, "VideoCreationDate"),
+                                    UserProfileId = DbUtils.GetInt(reader, "VideoPosterId"),
+                                    Comments = new()
+                                };
+                            }
+                            if(video != null && DbUtils.IsNotDbNull(reader, "CommentId"))
+                            {
+                                Comment comment = new()
+                                {
+                                    Id = DbUtils.GetInt(reader, "CommentId"),
+                                    Message = DbUtils.GetString(reader, "Message"),
+                                    UserProfileId = DbUtils.GetInt(reader, "CommentPosterId")
+                                };
+
+                                video.Comments.Add(comment);
+                            }
+                        }
+                    }
+                }
+            }
+            return video;
+        }
     }
 }
