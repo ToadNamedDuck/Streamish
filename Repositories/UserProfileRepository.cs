@@ -138,8 +138,8 @@ namespace Streamish.Repositories
                                         from UserProfile u
                                         left join Video v
 
-                                        on v.UserProfileId = Id
-                                        where Id = @id";
+                                        on v.UserProfileId = u.Id
+                                        where u.Id = @id";
 
                     DbUtils.AddParameter(cmd, "@id", id);
 

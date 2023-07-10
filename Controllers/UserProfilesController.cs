@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Streamish.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserProfilesController : ControllerBase
     {
@@ -36,6 +36,20 @@ namespace Streamish.Controllers
         {
             UserProfile user = _userRepository.GetById(id);
             if(user != null)
+            {
+                return Ok(user);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetWithVideos(int id)
+        {
+            UserProfile user = _userRepository.GetByIdWithVideos(id);
+            if (user != null)
             {
                 return Ok(user);
             }
