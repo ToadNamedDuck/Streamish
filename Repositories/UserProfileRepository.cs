@@ -110,7 +110,17 @@ namespace Streamish.Repositories
         }
         public void Delete(int id)
         {
+            using (var connection = Connection)
+            {
+                connection.Open();
 
+                using(var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = @"Delete from UserProfile where Id = @id";
+                    DbUtils.AddParameter(cmd, "@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         private UserProfile UserBuilder(SqlDataReader reader)
