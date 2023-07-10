@@ -81,7 +81,7 @@ namespace Streamish.Repositories
                     }
                     cmd.Parameters.AddWithValue("@dateCreated", DateTime.Now);
 
-                    cmd.ExecuteNonQuery();
+                    profile.Id = (int)cmd.ExecuteScalar();
                 }
             }
         }
