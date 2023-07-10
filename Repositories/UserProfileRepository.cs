@@ -122,6 +122,52 @@ namespace Streamish.Repositories
                 }
             }
         }
+        public UserProfile GetByIdWithVideos(int id)
+        {
+            UserProfile user = null;
+            using (var connection = Connection)
+            {
+                connection.Open();
+                using(var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = @"Select u.Id, u.Name, u.Email, u.ImageUrl, u.DateCreated, 
+
+                                        v.Id as VideoId, v.Title, v.Description, v.Url, v.DateCreated as VideoDate,
+                                        v.UserProfileId
+                                        
+                                        from UserProfile u
+                                        left join Video v
+
+                                        on v.UserProfileId = Id
+                                        where Id = @id";
+
+                    DbUtils.AddParameter(cmd, "@id", id);
+
+                    using(SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while(reader.Read())
+                        {
+                            if(user == null)
+                            {
+                                user = UserBuilder(reader);
+                            }
+
+                            Video video = new()
+                            {
+                                Id = DbUtils.GetInt(reader, "VideoId"),
+                                Title = DbUtils.GetString(reader, "Title"),
+                                Description = DbUtils.GetString(reader, "Description"),
+                                Url = DbUtils.GetString(reader, "Url"),
+                                DateCreated = DbUtils.GetDateTime(reader, "VideoDate"),
+                                UserProfileId = DbUtils.GetInt(reader, "UserProfileId")
+                            };
+                            user.Videos.Add(video);
+                        }
+                    }
+                }
+            }
+            return user;
+        }
 
         private UserProfile UserBuilder(SqlDataReader reader)
         {

@@ -18,5 +18,7 @@ namespace Streamish.Models
 
         public DateTime DateCreated { get; set; }
 
+        public List<Video> Videos { get; set; }
+
     }
 }
