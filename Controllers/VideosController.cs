@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Streamish.Repositories;
 using Streamish.Models;
+using System.Collections.Generic;
 
 namespace Streamish.Controllers
 {
@@ -84,7 +85,15 @@ namespace Streamish.Controllers
         [HttpGet("Hottest")]
         public IActionResult Hottest(DateTime q)
         {
-            return Ok(_videoRepository.Hottest(q));
+            List<Video> videos = _videoRepository.Hottest(q);
+            try
+            {
+                return Ok(videos);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }
