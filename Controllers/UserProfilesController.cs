@@ -34,11 +34,12 @@ namespace Streamish.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            try
+            UserProfile user = _userRepository.GetById(id);
+            if(user != null)
             {
-                return Ok(_userRepository.GetById(id));
+                return Ok(user);
             }
-            catch
+            else
             {
                 return NotFound();
             }
@@ -67,6 +68,10 @@ namespace Streamish.Controllers
             {
                 return BadRequest();
             }
+            if(_userRepository.GetById(id) == null)
+            {
+                return NotFound();
+            }
             else
             {
                 try
@@ -85,14 +90,22 @@ namespace Streamish.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            try
-            {
-                _userRepository.Delete(id);
-                return NoContent();
-            }
-            catch
+            UserProfile user = _userRepository.GetById(id);
+            if(user == null)
             {
                 return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    _userRepository.Delete(id);
+                    return NoContent();
+                }
+                catch
+                {
+                    return BadRequest();
+                }
             }
         }
     }
