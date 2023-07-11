@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Video from "./Video";
 import VideoSearch from "./VideoSearch"
+import VideoForm from "./VideoForm"
 import { getAllVideosWithComments, searchForVideo } from "../modules/VideoManager";
 
 const VideoList = () => {
@@ -37,6 +38,7 @@ const VideoList = () => {
               <Video video={v} key={v.id + "00251"}/>
             )}
         </div>
+        <VideoForm setVideos={setVideos}/>
     </div>
   );
 }
