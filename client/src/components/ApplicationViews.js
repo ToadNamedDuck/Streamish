@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import VideoList from "./VideoList";
 import VideoForm from "./VideoForm";
+import VideoDetails from "./VideoDetails";
 
 const ApplicationViews = () => {
 
@@ -18,7 +19,7 @@ const ApplicationViews = () => {
                 <Route path="videos">
                     <Route index element={<VideoList loadingVideo={loadingVideo}/>} />
                     <Route path="add" element={<VideoForm />} />
-                    <Route path=":id" element={<p>TODO: Make Video Details component</p>} />
+                    <Route path=":id" element={<VideoDetails />} />
                 </Route>
             </Route>
             <Route path="*" element={<p>Whoops, nothing here...</p>} />
