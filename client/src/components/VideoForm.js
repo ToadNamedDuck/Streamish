@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { CardHeader, Card, CardBody, FormGroup } from "reactstrap"
-import { addVideo, getAllVideosWithComments } from "../modules/VideoManager"
+import { addVideo } from "../modules/VideoManager"
+import { useNavigate } from "react-router-dom"
 
-const VideoForm = ({setVideos}) => {
+const VideoForm = () => {
 
     const [videoToSubmit, setVideo] = useState({
         Title: "",
         Description: "",
         Url: ""
     })
+
+    const navigate = useNavigate();
 
     const changeValue = (key, value) => {//this function gets all of the keys on the videoToSubmit object, and checks to see if the
         //supplied key exists or not on the object. if it does, it copies the object, sets the value of the key on the copy, and replaces
@@ -23,10 +26,12 @@ const VideoForm = ({setVideos}) => {
 
         }
 
-    const submitOnClickHandler = () => {
+    const submitOnClickHandler = (e) => {
+
+        e.preventDefault()
+
         addVideo(videoToSubmit);
-        getAllVideosWithComments()
-            .then(videos => setVideos(videos))
+        navigate("/videos");
     }
 
     return <>
@@ -41,7 +46,7 @@ const VideoForm = ({setVideos}) => {
                     <input type="text" placeholder="Title" required onChange={ e => {changeValue("Title", e.target.value)} } />
                     <input type="text" placeholder="Description" onChange={e => {changeValue("Description", e.target.value)} } />
                     <input type="text" placeholder="Video Link" required onChange={e => {changeValue("Url", e.target.value)} } />
-                    <button type="button" onClick={submitOnClickHandler}>Submit</button>
+                    <button type="button" onClick={ e => {submitOnClickHandler(e)}}>Submit</button>
                 </FormGroup>
             </CardBody>
         </Card>

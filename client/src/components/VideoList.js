@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Video from "./Video";
 import VideoSearch from "./VideoSearch"
-import VideoForm from "./VideoForm"
-import { getAllVideosWithComments, searchForVideo } from "../modules/VideoManager";
+import { searchForVideo } from "../modules/VideoManager";
+import { getAllVideosWithComments } from "../modules/VideoManager";
 
-const VideoList = () => {
+const VideoList = ( {loadingVideo} ) => {
 
-    const loadingVideo = {
-        comments: [{message: "Loading"}],
-        name: "Loading",
-        userProfile: {name: "Loading"}
-    }
+  const [searchQuery, setSearchQuery] = useState(null);
 
   const [videos, setVideos] = useState([loadingVideo]);
-  const [searchQuery, setSearchQuery] = useState(null);
 
   const getVideos = () => {
     getAllVideosWithComments().then(videos => setVideos(videos));
-  };
+};
 
-  useEffect(() => {
+useEffect(() => {
     getVideos();
-  }, []);
+}, []);
 
   useEffect(() => {
     if(searchQuery !== null){
@@ -35,10 +30,9 @@ const VideoList = () => {
         <VideoSearch setSearchQuery={setSearchQuery}/>
         <div className="row justify-content-center">
             {videos.map(v => 
-              <Video video={v} key={v.id + "00251"}/>
+              <Video video={v}/>
             )}
         </div>
-        <VideoForm setVideos={setVideos}/>
     </div>
   );
 }
