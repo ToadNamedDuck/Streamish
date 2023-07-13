@@ -18,10 +18,13 @@ GO
 
 CREATE TABLE [UserProfile] (
   [Id] INTEGER PRIMARY KEY IDENTITY NOT NULL,
-  [Name] VARCHAR(25) NOT NULL,
-  [Email] VARCHAR(255) NOT NULL,
-  [ImageUrl] VARCHAR(255) NULL,
-  [DateCreated] DATETIME NOT NULL
+  [FirebaseUserId] NVARCHAR(28) NOT NULL,
+  [Name] NVARCHAR(255) NOT NULL,
+  [Email] NVARCHAR(255) NOT NULL,
+  [ImageUrl] NVARCHAR(255) NULL,
+  [DateCreated] DATETiME NOT NULL,
+
+  CONSTRAINT UQ_FirebaseUserId UNIQUE(FirebaseUserId)
 )
 GO
 
